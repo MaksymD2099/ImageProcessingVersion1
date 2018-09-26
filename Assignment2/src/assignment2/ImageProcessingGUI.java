@@ -15,14 +15,15 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author cstuser
  */
-public class ImageProcessingGUI extends javax.swing.JFrame {
+public class ImageProcessingGUI extends javax.swing.JFrame  {
 
+    
     /**
      * Creates new form ImageProcessing
      */
     public ImageProcessingGUI() {
         initComponents();
-        
+         
             }
 
     /**
@@ -279,45 +280,22 @@ public class ImageProcessingGUI extends javax.swing.JFrame {
 
     private void ApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ApplyButtonActionPerformed
         // TODO add your handling code here:
-     if(ConvertGreyScaleCheck.isSelected()) 
-     {
-       
-       final BufferedImage input = InputImagePanel.getBufferedImage();     
         
-        /*if (checkbox.isSelected())
-        {
-            input = ImageProcessing.applySomeFiler(input);
+        BufferedImage input = InputImagePanel.getBufferedImage();  
+        BufferedImage output = OutputImagePanel.getBufferedImage();
+    
+        if(ConvertGreyScaleCheck.isSelected()) {
+            
+         ImageProcessing.applyGreyScale(input, output);
+         
         }
         
-        if (otherChecboc.)
-        {
-            input = 
-        }*/
-                           
-        BufferedImage output = new BufferedImage(input.getWidth(),
-                                                 input.getHeight(),
-                                                 input.getType());
-        
-        for (int j=0; j<input.getHeight(); j++)
-        {
-            for (int i=0; i<input.getWidth(); i++)
-            {
-                // Read color from input pixel
-                Color color = new Color(input.getRGB(i, j));
-                
-                // Average R G B color channels
-                int r = color.getRed();
-                int g = color.getGreen();
-                int b = color.getBlue();
-                int avg = (r + g + b) / 3;
-                
-                // Write the grey scales color to output pixel
-                output.setRGB(i, j, new Color(avg, avg, avg).getRGB());
-            }
+        if(GaussianFilterCheck.isSelected())
+        {          
+            OutputImagePanel.setImage(ImageProcessing.applyGaussianBlur(input));
         }
-        
-        OutputImagePanel.setImage(output);
-     } 
+
+      
     }//GEN-LAST:event_ApplyButtonActionPerformed
 
     private void OpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenFileActionPerformed
@@ -406,7 +384,7 @@ public class ImageProcessingGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ApplyButton;
     public javax.swing.JCheckBox BoxFilterCheck;
-    public javax.swing.JCheckBox ConvertGreyScaleCheck;
+    public static javax.swing.JCheckBox ConvertGreyScaleCheck;
     public javax.swing.JCheckBox EdgeDetectionsFilterCheck;
     private javax.swing.JFileChooser FileChooser;
     public javax.swing.JSlider GammaSlider;
@@ -414,7 +392,7 @@ public class ImageProcessingGUI extends javax.swing.JFrame {
     public assignment2.ImagePanel InputImagePanel;
     private javax.swing.JButton OpenFile;
     private javax.swing.JMenuItem OpenTab;
-    public assignment2.ImagePanel OutputImagePanel;
+    public static assignment2.ImagePanel OutputImagePanel;
     private javax.swing.JLabel ProcessLabel;
     private javax.swing.JMenuItem QuitTab;
     private javax.swing.JButton SaveFile;
