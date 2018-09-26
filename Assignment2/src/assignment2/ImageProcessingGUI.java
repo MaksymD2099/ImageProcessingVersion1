@@ -328,7 +328,7 @@ public class ImageProcessingGUI extends javax.swing.JFrame {
         if(returnVal == JFileChooser.APPROVE_OPTION)
         {
             File file = fc.getSelectedFile();
-            //InputImagePanel.setImage(file.getPath());
+            InputImagePanel.setImage(file.getPath());
         
         }else{}
         
