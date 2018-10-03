@@ -24,8 +24,14 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
      */
     public ImageProcessingGUI() {
         initComponents();
-         
-            }
+        ApplyButton.setEnabled(false);       
+        EdgeDetectionsFilterCheck.setEnabled(false);
+        ConvertGreyScaleCheck.setEnabled(false);
+        GaussianFilterCheck.setEnabled(false);
+        BoxFilterCheck.setEnabled(false);
+        GammaSlider.setEnabled(false);
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -307,7 +313,9 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
           OutputImagePanel.setImage(input);
         }
         
-        double gamma = GammaSlider.getValue()/50;
+        double gamma = GammaSlider.getValue()/50.0;
+        input = ImageProcessing.gammaCorrection(input, gamma);
+        OutputImagePanel.setImage(input);
       
     }                                           
 
@@ -320,6 +328,15 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         {
             File file = fc.getSelectedFile();
             InputImagePanel.setImage(file.getPath());
+            
+            //Enabling the buttons
+            
+            ApplyButton.setEnabled(true);                       
+            EdgeDetectionsFilterCheck.setEnabled(true);
+            ConvertGreyScaleCheck.setEnabled(true);
+            GaussianFilterCheck.setEnabled(true);
+            BoxFilterCheck.setEnabled(true);
+            GammaSlider.setEnabled(true);
         
         }else{}
         
@@ -343,11 +360,9 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
             public String getDescription() {
                 return "Image files";
             }
-            
-            
+       
     });
-            
-         
+                     
     }                                        
 
     private void SaveFileActionPerformed(java.awt.event.ActionEvent evt) {                                         
@@ -368,19 +383,30 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
             if(fileToSaveString.endsWith(".jpg"))
             {
                 try
-                {
-                ImageIO.write(OutputImagePanel.getBufferedImage(), "jpg", fileToSave);
+                {                    
+                    ImageIO.write(OutputImagePanel.getBufferedImage(), "jpg", fileToSave);
                 }
                 catch(Exception e)
                 {
                     ProcessLabel.setText("error saving image...");
                 }
             }
-            
-            if(fileToSaveString.endsWith(".png") == false)
+            else
             {
-                fileToSaveString += ".png";
-            }                     
+                 if(fileToSaveString.endsWith(".png") == false)
+                     fileToSaveString += ".png";
+                try
+                {
+                    ImageIO.write(OutputImagePanel.getBufferedImage(), "png", new File(fileToSaveString));
+                }
+                catch(Exception e)
+                {
+                    ProcessLabel.setText("error saving image...");
+                }
+                 
+            }
+            
+            
         }         
     }                                        
 
