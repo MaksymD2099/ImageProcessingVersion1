@@ -33,18 +33,8 @@ public class ImageProcessing extends ImageProcessingGUI
       
     public static BufferedImage applyGreyScale(BufferedImage input,BufferedImage output){
           
-        /*if (checkbox.isSelected())
-        {
-            input = ImageProcessing.applySomeFiler(input);
-        }
-        
-        if (otherChecboc.)
-        {
-            input = 
-        }*/       
-       output = new BufferedImage(input.getWidth(),
-                                                 input.getHeight(),
-                                                 input.getType());
+       
+       output = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
         
         for (int j=0; j<input.getHeight(); j++)
         {
@@ -64,6 +54,53 @@ public class ImageProcessing extends ImageProcessingGUI
             }
         }                 
         return output; 
+    }
+    
+    private static BufferedImage gammaCorrection(BufferedImage original, double gamma) {
+ 
+    int alpha, red, green, blue;
+    int newPixel;
+ 
+    double gamma_new = 1 / gamma;
+ 
+    BufferedImage gamma_cor = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+ 
+    for(int i=0; i<original.getWidth(); i++) {
+        for(int j=0; j<original.getHeight(); j++) {
+ 
+            // Get pixels by R, G, B
+            alpha = new Color(original.getRGB(i, j)).getAlpha();
+            red = new Color(original.getRGB(i, j)).getRed();
+            green = new Color(original.getRGB(i, j)).getGreen();
+            blue = new Color(original.getRGB(i, j)).getBlue();
+ 
+            red = (int) (255 * (Math.pow((double) red / (double) 255, gamma_new)));
+            green = (int) (255 * (Math.pow((double) green / (double) 255, gamma_new)));
+            blue = (int) (255 * (Math.pow((double) blue / (double) 255, gamma_new)));
+ 
+            // Return back to original format
+            newPixel = colorToRGB(alpha, red, green, blue);
+ 
+            // Write pixels into image
+            gamma_cor.setRGB(i, j, newPixel);
+ 
+        }
+ 
+    } 
+    return gamma_cor;        
+}
+    
+     private static int colorToRGB(int alpha, int red, int green, int blue) {
+ 
+        int newPixel = 0;
+        newPixel += alpha;
+        newPixel = newPixel << 8;
+        newPixel += red; newPixel = newPixel << 8;
+        newPixel += green; newPixel = newPixel << 8;
+        newPixel += blue;
+ 
+        return newPixel;
+ 
     }
     
    public static BufferedImage applyGaussianBlur(BufferedImage input)
