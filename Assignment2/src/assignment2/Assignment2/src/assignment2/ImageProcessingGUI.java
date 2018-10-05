@@ -10,6 +10,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -30,8 +33,7 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         GaussianFilterCheck.setEnabled(false);
         BoxFilterCheck.setEnabled(false);
         GammaSlider.setEnabled(false);
-        
-    }
+            }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,7 +66,6 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         OpenTab = new javax.swing.JMenuItem();
         SaveTab = new javax.swing.JMenuItem();
         QuitTab = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -116,6 +117,8 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
         jLabel4.setText("Gamma Correction:");
 
+        GammaSlider.setMaximum(200);
+
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
         jLabel5.setText("Convert to Grey Scales:");
 
@@ -165,6 +168,11 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         jMenu1.add(OpenTab);
 
         SaveTab.setText("Save");
+        SaveTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveTabActionPerformed(evt);
+            }
+        });
         jMenu1.add(SaveTab);
 
         QuitTab.setText("Quit");
@@ -176,9 +184,6 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         jMenu1.add(QuitTab);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -301,16 +306,21 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
         }
         
         if(GaussianFilterCheck.isSelected())
-        {          
-         //OutputImagePanel.setImage(ImageProcessing.applyGaussianBlur(input));
+        {                 
            input = ImageProcessing.applyGaussianBlur(input);
            OutputImagePanel.setImage(input);
         }
 
         if(BoxFilterCheck.isSelected())
         {          
-          input = ImageProcessing.applyBoxBlur(input,4);
-          OutputImagePanel.setImage(input);
+         input = ImageProcessing.applyBoxBlur(input,4);
+         OutputImagePanel.setImage(input);
+        }
+        
+        if(EdgeDetectionsFilterCheck.isSelected())
+        {
+             input = ImageProcessing.applyEdgeDetection(input);
+             OutputImagePanel.setImage(input);
         }
         
         double gamma = GammaSlider.getValue()/50.0;
@@ -321,102 +331,27 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
 
     private void OpenFileActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-        final JFileChooser fc = new JFileChooser();        
-        int returnVal = fc.showOpenDialog(null);
-        
-        if(returnVal == JFileChooser.APPROVE_OPTION)
-        {
-            File file = fc.getSelectedFile();
-            InputImagePanel.setImage(file.getPath());
-            
-            //Enabling the buttons
-            
-            ApplyButton.setEnabled(true);                       
-            EdgeDetectionsFilterCheck.setEnabled(true);
-            ConvertGreyScaleCheck.setEnabled(true);
-            GaussianFilterCheck.setEnabled(true);
-            BoxFilterCheck.setEnabled(true);
-            GammaSlider.setEnabled(true);
-        
-        }else{}
-        
-        fc.setCurrentDirectory(new File("./images"));
-        
-        fc.setFileFilter(new FileFilter(){
-        @Override
-        public boolean accept(File pathname){
-            String[] acceptedExtensions = {".jpg", ".jpeg", ".png", ".gif", ".tif", ".tiff"};
-            
-            for (String ext : acceptedExtensions) {
-                if(pathname.getName().toLowerCase().endsWith(ext)){
-                    return true;                    
-                }
-            }
-            return false;
-            
-        }
-
-            @Override
-            public String getDescription() {
-                return "Image files";
-            }
-       
-    });
-                     
+       OpenFile();   
     }                                        
 
     private void SaveFileActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-        JFileChooser fc = new JFileChooser();
-        
-        //Verify that the Output was changed    
-        
-        fc.setCurrentDirectory(new File("./src"));
-        int returnValue = fc.showSaveDialog(null);
-        int file = fc.showSaveDialog(null);
-        
-        if(returnValue == JFileChooser.APPROVE_OPTION)
-        {
-            File fileToSave = fc.getSelectedFile();            
-            String fileToSaveString = fileToSave.getAbsolutePath();
-            
-            if(fileToSaveString.endsWith(".jpg"))
-            {
-                try
-                {                    
-                    ImageIO.write(OutputImagePanel.getBufferedImage(), "jpg", fileToSave);
-                }
-                catch(Exception e)
-                {
-                    ProcessLabel.setText("error saving image...");
-                }
-            }
-            else
-            {
-                 if(fileToSaveString.endsWith(".png") == false)
-                     fileToSaveString += ".png";
-                try
-                {
-                    ImageIO.write(OutputImagePanel.getBufferedImage(), "png", new File(fileToSaveString));
-                }
-                catch(Exception e)
-                {
-                    ProcessLabel.setText("error saving image...");
-                }
-                 
-            }
-            
-            
-        }         
+       SaveFile();
     }                                        
 
     private void OpenTabActionPerformed(java.awt.event.ActionEvent evt) {                                        
         // TODO add your handling code here:
+        OpenFile();   
     }                                       
 
     private void QuitTabActionPerformed(java.awt.event.ActionEvent evt) {                                        
         // TODO add your handling code here:
         System.exit(0);
+    }                                       
+
+    private void SaveTabActionPerformed(java.awt.event.ActionEvent evt) {                                        
+        // TODO add your handling code here:
+        SaveFile();
     }                                       
 
     /**
@@ -477,7 +412,94 @@ public class ImageProcessingGUI extends javax.swing.JFrame  {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     // End of variables declaration                   
+
+  //Open Files
+    private void OpenFile() {
+        
+         final JFileChooser fc = new JFileChooser();        
+        int returnVal = fc.showOpenDialog(null);
+        
+        if(returnVal == JFileChooser.APPROVE_OPTION)
+        {
+            File file = fc.getSelectedFile();
+            InputImagePanel.setImage(file.getPath()); // Set Image to Input
+            
+            //Enabling the buttons            
+            ApplyButton.setEnabled(true);                       
+            EdgeDetectionsFilterCheck.setEnabled(true);
+            ConvertGreyScaleCheck.setEnabled(true);
+            GaussianFilterCheck.setEnabled(true);
+            BoxFilterCheck.setEnabled(true);
+            GammaSlider.setEnabled(true);
+        
+        }else{}
+        
+        fc.setCurrentDirectory(new File("./images"));
+        
+        fc.setFileFilter(new FileFilter(){
+        @Override
+        public boolean accept(File pathname){
+            String[] acceptedExtensions = {".jpg", ".jpeg", ".png", ".gif", ".tif", ".tiff"};
+            
+            for (String ext : acceptedExtensions) {
+                if(pathname.getName().toLowerCase().endsWith(ext)){
+                    return true;                    
+                }
+            }
+            return false;
+            
+        }
+
+            @Override
+            public String getDescription() {
+                return "Image files";
+            }          
+         });
+    }
+    
+    private void SaveFile()
+    {
+        JFileChooser fc = new JFileChooser();
+        
+        //Verify that the Output was changed    
+        
+        fc.setCurrentDirectory(new File("./src"));
+        int returnValue = fc.showSaveDialog(null);
+        int file = fc.showSaveDialog(null);
+        
+        if(returnValue == JFileChooser.APPROVE_OPTION)
+        {
+            File fileToSave = fc.getSelectedFile();            
+            String fileToSaveString = fileToSave.getAbsolutePath();
+            
+            if(fileToSaveString.endsWith(".jpg"))
+            {
+                try
+                {                    
+                    ImageIO.write(OutputImagePanel.getBufferedImage(), "jpg", fileToSave);
+                }
+                catch(Exception e)
+                {
+                    ProcessLabel.setText("error saving image...");
+                }
+            }
+            else
+            {
+                 if(fileToSaveString.endsWith(".png") == false)
+                     fileToSaveString += ".png";
+                try
+                {
+                    ImageIO.write(OutputImagePanel.getBufferedImage(), "png", new File(fileToSaveString));
+                }
+                catch(Exception e)
+                {
+                    ProcessLabel.setText("error saving image...");
+                }
+                 
+            }
+        }         
+    }
+
 }
