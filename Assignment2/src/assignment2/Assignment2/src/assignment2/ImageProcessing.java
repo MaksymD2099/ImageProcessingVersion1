@@ -1,4 +1,5 @@
 
+
 package assignment2;
 
 import java.awt.Color;
@@ -10,14 +11,9 @@ public class ImageProcessing extends ImageProcessingGUI
     
     public ImageProcessing()
     {
-        
+        //Empty
     }
-    
-    public void OpenFile()
-    {
-        
-    }
-    
+      
     public static BufferedImage applyBoxBlur(BufferedImage input, int radius){
         final int ARRAY_DIM = 2*radius+1;
         final float[][] boxkernel = new float[ARRAY_DIM][ARRAY_DIM];
@@ -32,9 +28,10 @@ public class ImageProcessing extends ImageProcessingGUI
     }
       
     public static BufferedImage applyGreyScale(BufferedImage input,BufferedImage output){
-          
-       
-       output = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
+                 
+       output = new BufferedImage(input.getWidth(),
+                                                 input.getHeight(),
+                                                 input.getType());
         
         for (int j=0; j<input.getHeight(); j++)
         {
@@ -56,7 +53,25 @@ public class ImageProcessing extends ImageProcessingGUI
         return output; 
     }
     
-    private static BufferedImage gammaCorrection(BufferedImage original, double gamma) {
+    public static BufferedImage applyEdgeDetection(BufferedImage input)
+    {
+        final float[][] edgeKernel = new float[3][3];
+        for(int i = 0; i < 3; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                if(i==1 && j==1)
+                {
+                    edgeKernel[i][j] = 8;
+                }
+                else{ edgeKernel[i][j] = -1;}
+            }
+        }
+        
+        return applyConvolutionFilter(input,edgeKernel);
+    }
+    
+    public static BufferedImage gammaCorrection(BufferedImage original, double gamma) {
  
     int alpha, red, green, blue;
     int newPixel;
